@@ -1,0 +1,55 @@
+﻿@page "/balancesheet"
+
+@using Inventory.Model
+@using Inventory.Service
+@inject BalanceSheetService BalanceSheetService
+
+<h3>Balance Sheet</h3>
+
+@if (balanceSheet == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Seller</th>
+                <th>Trans Type</th>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Total Price</th>
+                <th>Remaining Qty</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in balanceSheet)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Date.ToShortDateString()</td>
+                    <td>@item.SellerId</td>
+                    <td>@item.TransType.ToString()</td>
+                    <td>@item.Itemid</td>
+                    <td>@item.Price</td>
+                    <td>@item.Qty</td>
+                    <td>@item.TotalPrice</td>
+                    <td>@item.RemainingQty</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<BalanceSheet> balanceSheet;
+
+    protected override async Task OnInitializedAsync()
+    {
+        balanceSheet = await BalanceSheetService.GetBalanceSheetAsync();
+    }
+}

@@ -1,0 +1,97 @@
+﻿@page "/addtransactionview"
+
+@using Inventory.Model
+@using Inventory.Service
+@inject ItemService ItemService
+@inject TransactionService TransactionService
+
+<h3>Add Transaction</h3>
+
+<EditForm Model="@transaction" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="date">Date:</label>
+        <InputDate id="date" class="form-control" @bind-Value="transaction.Date" />
+        <ValidationMessage For="@(() => transaction.Date)" />
+    </div>
+
+    <div class="form-group">
+        <label for="sellerId">Seller ID:</label>
+        <InputText id="sellerId" class="form-control" @bind-Value="transaction.SellerId" />
+        <ValidationMessage For="@(() => transaction.SellerId)" />
+    </div>
+
+    <div class="form-group">
+        <label for="itemId">Item UPC:</label>
+        <InputSelect id="itemId" class="form-control" @bind-Value="transaction.ItemId">
+            @{
+
+                <option value="null" selected disabled>Select Option</option>
+                if (items != null)
+                    foreach (var itemId in items)
+                {
+                    <option value="@itemId">@itemId</option>
+                }
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => transaction.ItemId)" />
+    </div>
+
+    <div class="form-group">
+        <label for="type">Transaction Type:</label>
+        <InputSelect id="type" class="form-control" @bind-Value="transaction.Type">
+            <option value="@TransType.Sale">Sale</option>
+            <option value="@TransType.Purchase">Purchase</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => transaction.Type)" />
+    </div>
+
+    <div class="form-group">
+        <label for="qty">Quantity:</label>
+        <InputNumber id="qty" class="form-control" @bind-Value="transaction.Qty" />
+        <ValidationMessage For="@(() => transaction.Qty)" />
+    </div>
+
+    <div class="form-group">
+        <label for="price">Price:</label>
+        <InputNumber id="price" class="form-control" @bind-Value="transaction.Price" />
+        <ValidationMessage For="@(() => transaction.Price)" />
+    </div>
+
+    <div class="form-group">
+        <label for="totalPrice">Total Price:</label>
+        <InputNumber id="totalPrice" class="form-control" @bind-Value="transaction.TotalPrice" />
+        <ValidationMessage For="@(() => transaction.TotalPrice)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@if (submitSuccess)
+{
+    <p class="text-success">Transaction @transactionId submitted successfully!</p>
+}
+
+@code {
+    private Transaction transaction = new Transaction();
+    private bool submitSuccess = false;
+    private string transactionId = string.Empty;
+    private IEnumerable<string> items = null;
+
+    private async void HandleValidSubmit()
+    {
+        var result = await TransactionService.AddTransaction(transaction);
+        transactionId = result.Id.ToString();
+        submitSuccess = true;
+        transaction = new Transaction();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (items == null)
+        {
+            List<Items> item = await ItemService.GetAllItems();
+            items = item?.Select(x => x.UPC);
+        };
+    }
+}

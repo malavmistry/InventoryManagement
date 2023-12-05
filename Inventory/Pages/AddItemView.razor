@@ -1,0 +1,56 @@
+﻿@page "/additemview"
+
+@using Inventory.Model
+@using Inventory.Service
+@inject ItemService ItemService
+@inject NavigationManager NavigationManager
+
+<h3>Add Item</h3>
+<EditForm Model="@item" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="itemId">Item UPC:</label>
+        <InputText id="itemId" class="form-control" @bind-Value="item.UPC" />
+        <ValidationMessage For="@(() => item.UPC)" />
+    </div>
+
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <InputText id="name" class="form-control" @bind-Value="item.Name" />
+        <ValidationMessage For="@(() => item.Name)" />
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description:</label>
+        <InputText id="description" class="form-control" @bind-Value="item.Description" />
+        <ValidationMessage For="@(() => item.Description)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="margin:15px" disabled="@isBusy">Submit</button>
+    <button type="button" class="btn btn-primary" @onclick="NavigateToAddItem" style="margin:15px" disabled="@isBusy">Cancel</button>
+</EditForm>
+@if (submitSuccess)
+{
+    <p class="text-success">Item submitted successfully!</p>
+}
+
+@code {
+    private Items item = new Items();
+    private bool submitSuccess = false;
+    private bool isBusy = false;
+
+    private async Task HandleValidSubmit()
+    {
+        isBusy = true;
+        var result = await ItemService.AddItems(item);
+        submitSuccess = result;
+        if (result)
+            item = new Items();
+
+        isBusy = false;
+    }
+    private void NavigateToAddItem()
+    {
+        NavigationManager.NavigateTo("ItemView");
+    }
+}

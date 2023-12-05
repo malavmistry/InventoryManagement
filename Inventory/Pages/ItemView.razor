@@ -1,0 +1,52 @@
+﻿@page "/ItemView"
+
+@using Inventory.Model
+@using Inventory.Service
+@inject ItemService ItemService
+@inject NavigationManager NavigationManager
+
+<h3>Items</h3>
+<button class="btn btn-primary" style="float:right" @onclick="NavigateToAddItem">Add Item</button>
+@if (items == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>UPC</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Qty</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in items)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.UPC</td>
+                    <td>@item.Name</td>
+                    <td>@item.Description</td>
+                    <td>@item.Qty</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Items> items;
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await ItemService.GetAllItems();
+    }
+    private void NavigateToAddItem()
+    {
+        NavigationManager.NavigateTo("additemview");
+    }
+}
