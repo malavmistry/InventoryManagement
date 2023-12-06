@@ -32,23 +32,33 @@ namespace Inventory.Service
             item.Price = trans.Price;
             item.TotalPrice = trans.TotalPrice;
             item.Qty = trans.Qty;
-            var lastItem = _balanceSheet?.OrderByDescending(x => x.Id)
-                                        .FirstOrDefault(x=> x.Itemid == trans.ItemId);
-
+            var lastItem = (await _itemService.GetAllItems()).FirstOrDefault(x=> x.UPC == trans.ItemId);
+            double price = 0;
             switch (trans.Type)
             {
                 case TransType.Sale:
-                    item.RemainingQty = (lastItem?.RemainingQty ?? 0) - trans.Qty;
+                    price = (lastItem.SaleQty * lastItem.SalePrice) + item.TotalPrice;
+                    lastItem.RemainingQty = lastItem.RemainingQty - trans.Qty;
+                    lastItem.SaleQty = lastItem.SaleQty + trans.Qty;
+                    lastItem.SalePrice = price / lastItem.SaleQty;
+
                     break;
 
                 case TransType.Purchase:
-                    item.RemainingQty = (lastItem?.RemainingQty ?? 0) + trans.Qty;
+                    price = (lastItem.PurchasedQty * lastItem.CostPrice) + item.TotalPrice;
+                    lastItem.RemainingQty = lastItem.RemainingQty + trans.Qty;
+                    lastItem.PurchasedQty = lastItem.PurchasedQty + trans.Qty;
+                    lastItem.CostPrice = price/ lastItem.PurchasedQty;
                     break;
             }
+            lastItem.Diff = lastItem.SalePrice - lastItem.CostPrice;
+            lastItem.TotalDiff = lastItem.Diff * lastItem.SaleQty;
+
+            item.RemainingQty = lastItem.RemainingQty;
             var result = await _context.AddItemAsync<BalanceSheet>(item);
             if (!result)
                 throw new Exception("Something went wrong adding transction.");
-            await _itemService.UpdateItemQty(item.Itemid, item.RemainingQty);
+            await _itemService.UpdateItem(lastItem);
             await GetBalanceSheetAsync(true);
             return result;
         }

@@ -24,14 +24,8 @@ namespace Inventory.Service
             await _context.GetAllAsync<Items>();
             return result;
         }
-        public async Task<bool> UpdateItemQty(string itemUpc, int qty)
+        public async Task<bool> UpdateItem(Items item)
         {
-            var items = await GetAllItems();
-            var item = items.FirstOrDefault(x => x.UPC == itemUpc);
-
-            if(item == null)
-                throw new ApplicationException($"Item with UPC-{item.UPC} not found");
-            item.Qty = qty;
             var result = await _context.UpdateItemAsync(item);
 
             if (!result)

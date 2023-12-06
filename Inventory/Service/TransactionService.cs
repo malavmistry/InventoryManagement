@@ -28,7 +28,7 @@ namespace Inventory.Service
 
         public async Task<Transaction> AddTransaction(Transaction trans)
         {
-            var res = await _context.AddItemAsync<Transaction>(trans);
+            var res = await _context.AddItemAsync(trans);
             if (!res)
                 throw new Exception("Something went wrong adding transction.");
             var result = await _context.GetAllAsync<Transaction>();

@@ -7,6 +7,8 @@
 
 <h3>Items</h3>
 
+<p><em>Total PnL: @totalPnL </em></p>
+
 @if (items == null)
 {
     <p><em>Loading...</em></p>
@@ -19,7 +21,13 @@ else
                 <th>UPC</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th>Qty</th>
+                <th>Purchased Qty</th>
+                <th>Sale Qty</th>
+                <th>Remaining Qty</th>
+                <th>Cost Price</th>
+                <th>Sale Price</th>
+                <th>PnL</th>
+                <th>Total PnL</th>
                 <th>
                     <a @onclick="NavigateToAddItem">
                         <span class="oi oi-plus" aria-hidden="false" />
@@ -34,7 +42,13 @@ else
                     <td>@item.UPC</td>
                     <td>@item.Name</td>
                     <td>@item.Description</td>
-                    <td>@item.Qty</td>
+                    <td>@item.PurchasedQty</td>
+                    <td>@item.SaleQty</td>
+                    <td>@item.RemainingQty</td>
+                    <td>@item.CostPrice</td>
+                    <td>@item.SalePrice</td>
+                    <td>@item.Diff</td>
+                    <td>@item.TotalDiff</td>
                     <td>
                         <a @onclick="async ()=> await DeleteItem(item)">
                             <span class="oi oi-trash" aria-hidden="false" />
@@ -51,6 +65,7 @@ else
 }
 @code {
     private List<Items> items;
+    private double totalPnL = 0;
     private string _message;
 
     protected override async Task OnInitializedAsync()
@@ -70,5 +85,12 @@ else
         await GetItems();
     }
 
-    private async Task GetItems() => items = await ItemService.GetAllItems();
+    private async Task GetItems() 
+    { 
+        items = await ItemService.GetAllItems();
+        totalPnL = 0;
+        foreach(var item in items){
+            totalPnL += item.TotalDiff;
+        }
+    }
 }
