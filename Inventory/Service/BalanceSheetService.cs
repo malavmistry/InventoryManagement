@@ -40,7 +40,7 @@ namespace Inventory.Service
                     price = (lastItem.SaleQty * lastItem.SalePrice) + item.TotalPrice;
                     lastItem.RemainingQty = lastItem.RemainingQty - trans.Qty;
                     lastItem.SaleQty = lastItem.SaleQty + trans.Qty;
-                    lastItem.SalePrice = price / lastItem.SaleQty;
+                    lastItem.SalePrice = Math.Round(price / lastItem.SaleQty);
 
                     break;
 
@@ -48,7 +48,7 @@ namespace Inventory.Service
                     price = (lastItem.PurchasedQty * lastItem.CostPrice) + item.TotalPrice;
                     lastItem.RemainingQty = lastItem.RemainingQty + trans.Qty;
                     lastItem.PurchasedQty = lastItem.PurchasedQty + trans.Qty;
-                    lastItem.CostPrice = price/ lastItem.PurchasedQty;
+                    lastItem.CostPrice = Math.Round(price / lastItem.PurchasedQty);
                     break;
             }
             lastItem.Diff = lastItem.SalePrice - lastItem.CostPrice;
