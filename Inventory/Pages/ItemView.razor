@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 
 <h3>Items</h3>
-<button class="btn btn-primary" style="float:right" @onclick="NavigateToAddItem">Add Item</button>
+
 @if (items == null)
 {
     <p><em>Loading...</em></p>
@@ -16,37 +16,59 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>UPC</th>
                 <th>Name</th>
                 <th>Description</th>
                 <th>Qty</th>
+                <th>
+                    <a @onclick="NavigateToAddItem">
+                        <span class="oi oi-plus" aria-hidden="false" />
+                    </a>
+                </th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in items)
             {
                 <tr>
-                    <td>@item.Id</td>
                     <td>@item.UPC</td>
                     <td>@item.Name</td>
                     <td>@item.Description</td>
                     <td>@item.Qty</td>
+                    <td>
+                        <a @onclick="async ()=> await DeleteItem(item)">
+                            <span class="oi oi-trash" aria-hidden="false" />
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
-
+@if (!string.IsNullOrEmpty(_message))
+{
+    <p class="text-success" style="margin-top:25px"><em>@_message</em></p>
+}
 @code {
     private List<Items> items;
+    private string _message;
 
     protected override async Task OnInitializedAsync()
     {
-        items = await ItemService.GetAllItems();
+        await GetItems();
     }
+
     private void NavigateToAddItem()
     {
         NavigationManager.NavigateTo("additemview");
     }
+
+    private async Task DeleteItem(Items item)
+    {
+        var result = await ItemService.DeleteItem(item);
+        _message = "Item deleted successfully!";
+        await GetItems();
+    }
+
+    private async Task GetItems() => items = await ItemService.GetAllItems();
 }

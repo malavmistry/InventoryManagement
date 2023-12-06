@@ -43,5 +43,10 @@ namespace Inventory.Service
             var result = await _context.GetAllAsync<Items>();
             return result;
         }
+        public async Task<bool> DeleteItem(Items item)
+        {
+            var result = await _context.DeleteItemAsync<Items>(item);
+            return result;
+        }
     }
 }

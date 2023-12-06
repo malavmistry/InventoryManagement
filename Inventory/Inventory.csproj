@@ -59,6 +59,23 @@
     </ItemGroup>
 
     <ItemGroup>
+      <AndroidResource Remove="Pages\Dialog\**" />
+      <Compile Remove="Pages\Dialog\**" />
+      <Content Remove="Pages\Dialog\**" />
+      <EmbeddedResource Remove="Pages\Dialog\**" />
+      <MauiXaml Remove="Pages\Dialog\**" />
+      <None Remove="Pages\Dialog\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="Pages\AddItemView.razor" />
+      <None Include="Pages\AddTransactionView.razor" />
+      <None Include="Pages\BalanceSheetView.razor" />
+      <None Include="Pages\Index.razor" />
+      <None Include="Pages\ItemView.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
         <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
     </ItemGroup>

@@ -3,6 +3,7 @@
 @using Inventory.Model
 @using Inventory.Service
 @inject BalanceSheetService BalanceSheetService
+@inject NavigationManager NavigationManager
 
 <h3>Balance Sheet</h3>
 
@@ -24,6 +25,11 @@ else
                 <th>Qty</th>
                 <th>Total Price</th>
                 <th>Remaining Qty</th>
+                <th>
+                    <a @onclick="NavigateToAddTransaction">
+                        <span class="oi oi-plus" aria-hidden="false" />
+                    </a>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -39,6 +45,11 @@ else
                     <td>@item.Qty</td>
                     <td>@item.TotalPrice</td>
                     <td>@item.RemainingQty</td>
+                    <td>
+                        <a >
+                            <span class="oi oi-eye" aria-hidden="false" />
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -51,5 +62,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         balanceSheet = await BalanceSheetService.GetBalanceSheetAsync();
+    }
+
+    protected async Task NavigateToAddTransaction()
+    {
+        NavigationManager.NavigateTo("addtransactionview");
     }
 }
