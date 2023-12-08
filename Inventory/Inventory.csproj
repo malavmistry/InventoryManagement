@@ -31,12 +31,12 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
         <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
         <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-        <PackageCertificateThumbprint>640C6754D1FE82AE5C075607E4E02B6D8075DDB3</PackageCertificateThumbprint>
+        <PackageCertificateThumbprint>184C0888CBE1A3C9C99441CA8BE748692E93F60A</PackageCertificateThumbprint>
         <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
         <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
         <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
         <GenerateTestArtifacts>True</GenerateTestArtifacts>
-        <AppInstallerUri>C:\Users\malav.mistry\source\repos\InventoryManagement\publish</AppInstallerUri>
+        <AppInstallerUri>D:\source\publish\</AppInstallerUri>
         <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     </PropertyGroup>
 

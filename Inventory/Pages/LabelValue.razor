@@ -1,0 +1,33 @@
+﻿<!-- LabelValue.razor -->
+
+<div class="label-value" style="margin:15px">
+    <span class="label">@Label:</span>
+    <span class="value">@Value</span>
+</div>
+<style>
+    .label-value {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        width: 60%;
+        min-width: 200px;
+    }
+
+    .label {
+        font-weight: bold;
+        max-block-size: 5px;
+    }
+
+    .value {
+        max-width: 70%;
+        overflow-wrap:anywhere;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public object Value { get; set; }
+}

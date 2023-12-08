@@ -38,19 +38,29 @@ namespace Inventory.Service
                     price = (item.SaleQty * item.SalePrice) + trans.TotalPrice;
                     item.RemainingQty = item.RemainingQty - trans.Qty;
                     item.SaleQty = item.SaleQty + trans.Qty;
-                    item.SalePrice = Math.Round(price / item.SaleQty);
+                    item.SalePrice = Math.Ceiling((price / item.SaleQty) * 100) / 100;
                     break;
 
                 case TransType.Purchase:
                     price = (item.PurchasedQty * item.CostPrice) + trans.TotalPrice;
                     item.RemainingQty = item.RemainingQty + trans.Qty;
                     item.PurchasedQty = item.PurchasedQty + trans.Qty;
-                    item.CostPrice = Math.Round(price / item.PurchasedQty);
+                    item.CostPrice = Math.Ceiling((price / item.PurchasedQty) * 100) / 100;
                     break;
             }
             item.Diff = item.SalePrice - item.CostPrice;
             item.TotalDiff = item.Diff * item.SaleQty;
 
+            var result = await UpdateItem(item);
+
+            if (!result)
+                throw new ApplicationException($"Item with UPC-{item.UPC} not updated");
+
+            return result;
+        }
+
+        public async Task<bool> UpdateItem(Items item)
+        {
             var result = await _context.UpdateItemAsync(item);
 
             if (!result)
@@ -58,6 +68,7 @@ namespace Inventory.Service
 
             return result;
         }
+
         public async Task<List<Items>> GetAllItems()
         {
             var result = await _context.GetAllAsync<Items>();

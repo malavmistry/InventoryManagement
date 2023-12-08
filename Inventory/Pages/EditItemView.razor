@@ -1,0 +1,71 @@
+﻿@page "/EditItemView/{itemUPC}"
+
+@using Inventory.Model
+@using Inventory.Service
+
+@inject ItemService ItemService
+@inject TransactionService TransactionService
+@inject NavigationManager NavigationManager
+
+
+<h3>Item Details</h3>
+
+@if (Item == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div style="margin:15px">
+        <LabelValue Label="ID" Value=@Item.Id />
+        <LabelValue Label="UPC" Value=@Item.UPC />
+        <LabelValue Label="Name" Value=@Item.Name />
+        <LabelValue Label="Description" Value="@Item.Description" />
+        <LabelValue Label="PurchasedQty" Value="@Item.PurchasedQty" />
+        <LabelValue Label="SaleQty" Value="@Item.SaleQty" />
+        <LabelValue Label="RemainingQty" Value="@Item.RemainingQty" />
+        <LabelValue Label="CostPrice" Value="@Item.CostPrice" />
+        <LabelValue Label="SalePrice" Value="@Item.SalePrice" />
+        <LabelValue Label="Profit/Loss" Value="@Item.Diff" />
+        <LabelValue Label="Total Profit?Loss" Value="@Item.TotalDiff" />
+    </div>
+}
+@if (DeleteVisible)
+{
+    <button type="button" class="btn btn-primary" @onclick="async ()=> await DeleteItem(Item)" style="margin:15px">Delete Item</button>
+}
+else
+{
+    <button type="button" class="btn btn-primary" @onclick="async ()=> await DeleteTransaction(Item)" style="margin:15px">Delete Transactions</button>
+}
+<button type="button" class="btn btn-primary" @onclick="NavigateToItemView" style="margin:15px">Cancel</button>
+@code {
+    [Parameter]
+    public string ItemUPC { get; set; }
+
+    private Items Item;
+    private bool DeleteVisible;
+
+    private async Task NavigateToItemView()
+    {
+        NavigationManager.NavigateTo("/ItemView");
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        Item = await ItemService.GetItemByUPC(ItemUPC);
+        DeleteVisible = Item.PurchasedQty < 1 || Item.SaleQty < 1;
+    }
+
+    private async Task DeleteItem(Items item)
+    {
+        var result = await ItemService.DeleteItem(item);
+        NavigationManager.NavigateTo("/ItemView");
+    }
+
+    private async Task DeleteTransaction(Items item)
+    {
+        var result = await TransactionService.DeleteItemTransactions(item);
+        NavigationManager.NavigateTo("/ItemView");
+    }
+}

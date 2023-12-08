@@ -1,13 +1,14 @@
 ﻿@page "/ItemView"
 
 @using Inventory.Model
+@using Inventory.Pages
 @using Inventory.Service
 @inject ItemService ItemService
 @inject NavigationManager NavigationManager
 
 <h3>Items</h3>
 
-<p><em>Total PnL: @totalPnL </em></p>
+<LabelValue Label="Total PnL" Value="@totalPnL" />
 
 @if (items == null)
 {
@@ -21,6 +22,8 @@ else
                 <th>UPC</th>
                 <th>Name</th>
                 <th>Remaining Qty</th>
+                <th>Cost Price</th>
+                <th>Sale Price</th>
                 <th>PnL</th>
                 <th>Total PnL</th>
                 <th>
@@ -37,11 +40,13 @@ else
                     <td>@item.UPC</td>
                     <td>@item.Name</td>
                     <td>@item.RemainingQty</td>
+                    <td>@item.CostPrice</td>
+                    <td>@item.SalePrice</td>
                     <td>@item.Diff</td>
                     <td>@item.TotalDiff</td>
                     <td>
-                        <a @onclick="async ()=> await DeleteItem(item)">
-                            <span class="oi oi-trash" aria-hidden="false" />
+                        <a @onclick="async ()=> await EditItem(item)">
+                            <span class="oi oi-eye" aria-hidden="false" />
                         </a>
                     </td>
                 </tr>
@@ -73,6 +78,11 @@ else
         var result = await ItemService.DeleteItem(item);
         _message = "Item deleted successfully!";
         await GetItems();
+    }
+
+    private async Task EditItem(Items item)
+    {
+        NavigationManager.NavigateTo($"/EditItemView/{item.UPC}");
     }
 
     private async Task GetItems() 

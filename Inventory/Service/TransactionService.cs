@@ -48,5 +48,23 @@ namespace Inventory.Service
 
             return (await _context.GetFilteredAsync<Transaction>(x => x.Id == trans.Id))?.FirstOrDefault();
         }
+
+        public async Task<bool> DeleteItemTransactions(Items item)
+        {
+            bool isDeleted = true;
+            var transactions = await _context.GetFilteredAsync<Transaction>(x => x.ItemId == item.UPC);
+
+            foreach(var trans in transactions)
+            {
+                isDeleted = await _context.DeleteItemAsync(trans);
+                if(!isDeleted)
+                    throw new Exception("Something went wrong adding transction.");
+            }
+            item.SaleQty = item.RemainingQty = item.PurchasedQty = 0;
+            item.SalePrice = item.CostPrice = item.Diff = item.TotalDiff = 0;
+
+            isDeleted = await _itemService.UpdateItem(item);
+            return isDeleted;
+        }
     }
 }

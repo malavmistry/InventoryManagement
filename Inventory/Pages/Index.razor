@@ -1,5 +1,6 @@
 ﻿@page "/"
 
+@using System.Reflection;
 <h1>Inventory Management</h1>
 
 <p>
@@ -7,3 +8,16 @@
     2. Add Transactions<br>
     3. View Balance Sheet<br>
 </p>
+
+<h3>Application Version</h3>
+<p>@Version</p>
+@code{
+    private string Version = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var version = assembly.GetName().Version;
+        Version= version.ToString();
+    }
+}
