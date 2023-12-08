@@ -24,8 +24,6 @@ namespace Inventory
 #endif
 
             builder.Services.AddSingleton<DatabaseContext>();
-            builder.Services.AddSingleton<WeatherForecastService>();
-            builder.Services.AddTransient<BalanceSheetService>();
             builder.Services.AddTransient<ItemService>();
             builder.Services.AddTransient<TransactionService>();
 

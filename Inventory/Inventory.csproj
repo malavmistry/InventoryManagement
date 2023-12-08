@@ -70,7 +70,7 @@
     <ItemGroup>
       <None Include="Pages\AddItemView.razor" />
       <None Include="Pages\AddTransactionView.razor" />
-      <None Include="Pages\BalanceSheetView.razor" />
+      <None Include="Pages\TransactionView.razor" />
       <None Include="Pages\Index.razor" />
       <None Include="Pages\ItemView.razor" />
     </ItemGroup>

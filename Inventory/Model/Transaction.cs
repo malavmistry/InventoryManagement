@@ -19,5 +19,6 @@ namespace Inventory.Model
         public int Qty { get; set; }
         public double Price { get; set; }
         public double TotalPrice { get; set; }
+        public int RemainingQty { get; set; }
     }
 }

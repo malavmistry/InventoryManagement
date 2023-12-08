@@ -1,13 +1,13 @@
-﻿@page "/balancesheet"
+﻿@page "/TransactionView"
 
 @using Inventory.Model
 @using Inventory.Service
-@inject BalanceSheetService BalanceSheetService
+@inject TransactionService transactionService
 @inject NavigationManager NavigationManager
 
-<h3>Balance Sheet</h3>
+<h3>Transactions</h3>
 
-@if (balanceSheet == null)
+@if (transactions == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -33,14 +33,14 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in balanceSheet)
+            @foreach (var item in transactions)
             {
                 <tr>
                     <td>@item.Id</td>
                     <td>@item.Date.ToShortDateString()</td>
                     <td>@item.SellerId</td>
-                    <td>@item.TransType.ToString()</td>
-                    <td>@item.Itemid</td>
+                    <td>@item.Type.ToString()</td>
+                    <td>@item.ItemId</td>
                     <td>@item.Price</td>
                     <td>@item.Qty</td>
                     <td>@item.TotalPrice</td>
@@ -57,11 +57,11 @@ else
 }
 
 @code {
-    private List<BalanceSheet> balanceSheet;
+    private List<Transaction> transactions;
 
     protected override async Task OnInitializedAsync()
     {
-        balanceSheet = await BalanceSheetService.GetBalanceSheetAsync();
+        transactions = await transactionService.GetTransaction();
     }
 
     protected async Task NavigateToAddTransaction()

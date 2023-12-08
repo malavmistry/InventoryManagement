@@ -2,6 +2,7 @@
 using Inventory.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,12 +25,37 @@ namespace Inventory.Service
             await _context.GetAllAsync<Items>();
             return result;
         }
-        public async Task<bool> UpdateItem(Items item)
+        public async Task<bool> UpdateItem(Transaction trans)
         {
+            var item = (await GetAllItems()).FirstOrDefault(x => x.UPC == trans.ItemId);
+            if (item == null)
+                throw new ApplicationException($"Item with UPC-{item.UPC} not found");
+
+            double price = 0;
+            switch (trans.Type)
+            {
+                case TransType.Sale:
+                    price = (item.SaleQty * item.SalePrice) + trans.TotalPrice;
+                    item.RemainingQty = item.RemainingQty - trans.Qty;
+                    item.SaleQty = item.SaleQty + trans.Qty;
+                    item.SalePrice = Math.Round(price / item.SaleQty);
+                    break;
+
+                case TransType.Purchase:
+                    price = (item.PurchasedQty * item.CostPrice) + trans.TotalPrice;
+                    item.RemainingQty = item.RemainingQty + trans.Qty;
+                    item.PurchasedQty = item.PurchasedQty + trans.Qty;
+                    item.CostPrice = Math.Round(price / item.PurchasedQty);
+                    break;
+            }
+            item.Diff = item.SalePrice - item.CostPrice;
+            item.TotalDiff = item.Diff * item.SaleQty;
+
             var result = await _context.UpdateItemAsync(item);
 
             if (!result)
                 throw new ApplicationException($"Item with UPC-{item.UPC} not updated");
+
             return result;
         }
         public async Task<List<Items>> GetAllItems()
@@ -37,6 +63,12 @@ namespace Inventory.Service
             var result = await _context.GetAllAsync<Items>();
             return result;
         }
+        public async Task<Items> GetItemByUPC(string UPC)
+        {
+            var result = await _context.GetFilteredAsync<Items>(x=> x.UPC == UPC);
+            return result?.FirstOrDefault();
+        }
+
         public async Task<bool> DeleteItem(Items item)
         {
             var result = await _context.DeleteItemAsync<Items>(item);

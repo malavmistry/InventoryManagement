@@ -12,12 +12,12 @@ namespace Inventory.Service
     {
         private readonly DatabaseContext _context;
 
-        private readonly BalanceSheetService _balanceSheet;
+        private readonly ItemService _itemService;
 
-        public TransactionService(DatabaseContext context, BalanceSheetService balanceSheet)
+        public TransactionService(DatabaseContext context, ItemService itemService)
         {
             _context = context;
-            _balanceSheet = balanceSheet;
+            _itemService = itemService;
         }
 
         public async Task<List<Transaction>> GetTransaction() {
@@ -26,17 +26,27 @@ namespace Inventory.Service
             return result;
         }
 
+        public async Task<Transaction> GetTransactionByItemUPC(string itemUPC)
+        {
+            var result = await _context.GetFilteredAsync<Transaction>(x => x.ItemId == itemUPC);
+
+            return result?.FirstOrDefault();
+        }
+
         public async Task<Transaction> AddTransaction(Transaction trans)
         {
-            var res = await _context.AddItemAsync(trans);
-            if (!res)
+            var itemUpdated = await _itemService.UpdateItem(trans);
+            if(!itemUpdated)
                 throw new Exception("Something went wrong adding transction.");
-            var result = await _context.GetAllAsync<Transaction>();
 
-            await _balanceSheet.AddSheetTransaction(trans);
+            var lastItem = await _itemService.GetItemByUPC(trans.ItemId);
+            trans.RemainingQty = lastItem.RemainingQty;
 
-            return (await _context.GetFilteredAsync<Transaction>(x=> x.Id == trans.Id))
-                                  .FirstOrDefault();
+            var result = await _context.AddItemAsync<Transaction>(trans);
+            if (!result)
+                throw new Exception("Something went wrong adding transction.");
+
+            return (await _context.GetFilteredAsync<Transaction>(x => x.Id == trans.Id))?.FirstOrDefault();
         }
     }
 }
