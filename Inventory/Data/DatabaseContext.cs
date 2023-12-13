@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using Inventory.Properties;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,7 @@ namespace Inventory.Data
 {
     public class DatabaseContext: IAsyncDisposable
     {
-        private const string dbName = "InventoryManagement.db";
-        private static string _dbPath => Path.Combine(FileSystem.AppDataDirectory,dbName);
+        private static string _dbPath => Path.Combine(FileSystem.AppDataDirectory, Resource.DatabaseName);
         private SQLiteAsyncConnection _conn;
         private SQLiteAsyncConnection _database => _conn ??= new SQLiteAsyncConnection(_dbPath, SQLiteOpenFlags.Create| SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache);
         public DatabaseContext()
@@ -33,6 +33,11 @@ namespace Inventory.Data
         {
             await CreateTableIfNotExistsc<T>();
             return await action();
+        }
+
+        public string GetDbLocation()
+        {
+            return _dbPath;
         }
 
         public async Task<List<T>> GetAllAsync<T>() where T : class, new()

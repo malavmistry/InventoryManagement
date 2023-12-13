@@ -11,7 +11,6 @@ namespace Inventory.Service
     public class TransactionService
     {
         private readonly DatabaseContext _context;
-
         private readonly ItemService _itemService;
 
         public TransactionService(DatabaseContext context, ItemService itemService)

@@ -1,0 +1,44 @@
+﻿@page "/Configuration"
+
+@using System.Reflection;
+@inject HelperService HelperService
+
+<h1>Configuration</h1>
+
+<p>Application Version: @Version</p>
+
+<button type="button" class="btn btn-primary" @onclick="async ()=> await UploadDb()" style="margin:15px">Upload DB</button>
+
+<button type="button" class="btn btn-primary" @onclick="async ()=> await DownloadDb()" style="margin:15px">Download DB</button>
+
+@if (result.success ?? false)
+{
+    <p class="text-success">@result.message</p>
+}
+@if (!(result.success ?? true))
+{
+    <p class="text-danger">@result.message</p>
+}
+@code {
+    private string Version = string.Empty;
+    private string LocalPath = string.Empty;
+    private (bool? success, string message) result = (null, string.Empty);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var version = assembly.GetName().Version;
+        Version = version.ToString();
+    }
+
+    private async Task DownloadDb()
+    {
+        result = await HelperService.DownloadDb();
+    }
+
+    private async Task UploadDb()
+    {
+        result = await HelperService.UploadSnapshotDb();
+    }
+
+}

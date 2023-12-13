@@ -26,6 +26,7 @@ namespace Inventory
             builder.Services.AddSingleton<DatabaseContext>();
             builder.Services.AddTransient<ItemService>();
             builder.Services.AddTransient<TransactionService>();
+            builder.Services.AddTransient<HelperService>();
 
             return builder.Build();
         }
