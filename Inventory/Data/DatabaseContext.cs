@@ -12,7 +12,7 @@ namespace Inventory.Data
 {
     public class DatabaseContext: IAsyncDisposable
     {
-        private static string _dbPath => Path.Combine(FileSystem.AppDataDirectory, Resource.DatabaseName);
+        private static string _dbPath => Path.Combine(FileSystem.AppDataDirectory, Resources.DatabaseName);
         private SQLiteAsyncConnection _conn;
         private SQLiteAsyncConnection _database => _conn ??= new SQLiteAsyncConnection(_dbPath, SQLiteOpenFlags.Create| SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache);
         public DatabaseContext()

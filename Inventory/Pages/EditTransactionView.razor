@@ -1,0 +1,56 @@
+﻿@page "/EditTransactionView/{Id}"
+
+@using Inventory.Model
+@using Inventory.Service
+
+@inject ItemService ItemService
+@inject TransactionService TransactionService
+@inject NavigationManager NavigationManager
+
+
+<h3>Transaction Details</h3>
+
+@if (Item == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div style="margin:15px">
+        <LabelValue Label="ID" Value=@Item.Id />
+        <LabelValue Label="Date" Value=@Item.Date />
+        <LabelValue Label="Seller" Value="@Item.SellerId" />
+        <LabelValue Label="Item" Value="@Item.ItemId" />
+        <LabelValue Label="Type" Value="@Item.Type" />
+        <LabelValue Label="Qty" Value="@Item.Qty" />
+        <LabelValue Label="Price" Value="@Item.Price" />
+        <LabelValue Label="Total Price" Value="@Item.TotalPrice" />
+        <LabelValue Label="Remaining Qty" Value="@Item.RemainingQty" />
+    </div>
+}
+
+    <button type="button" class="btn btn-primary" @onclick="async ()=> await DeleteTransaction(Item)" style="margin:15px">Remove Transaction</button>
+
+<button type="button" class="btn btn-primary" @onclick="NavigateToItemView" style="margin:15px">Cancel</button>
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private Transaction Item;
+
+    private async Task NavigateToItemView()
+    {
+        NavigationManager.NavigateTo("/TransactionView");
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        Item = await TransactionService.GetTransactionById(int.Parse(Id));
+    }
+
+    private async Task DeleteTransaction(Transaction item)
+    {
+        var result = await TransactionService.DeleteItemTransaction(item);
+        NavigationManager.NavigateTo("/TransactionView");
+    }
+}

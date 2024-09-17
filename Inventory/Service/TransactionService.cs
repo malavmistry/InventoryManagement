@@ -19,10 +19,18 @@ namespace Inventory.Service
             _itemService = itemService;
         }
 
-        public async Task<List<Transaction>> GetTransaction() {
+        public async Task<List<Transaction>> GetTransaction()
+        {
             var result = await _context.GetAllAsync<Transaction>();
 
             return result;
+        }
+
+        public async Task<Transaction> GetTransactionById(int Id)
+        {
+            var result = await _context.GetFilteredAsync<Transaction>(x => x.Id == Id);
+
+            return result.FirstOrDefault();
         }
 
         public async Task<Transaction> GetTransactionByItemUPC(string itemUPC)
@@ -63,6 +71,17 @@ namespace Inventory.Service
             item.SalePrice = item.CostPrice = item.Diff = item.TotalDiff = 0;
 
             isDeleted = await _itemService.UpdateItem(item);
+            return isDeleted;
+        }
+
+        public async Task<bool> DeleteItemTransaction(Transaction tran)
+        {
+            bool isDeleted = true;
+            isDeleted = await _context.DeleteItemAsync(tran);
+            if (!isDeleted)
+                    throw new Exception("Something went wrong adding transction.");
+            // Update item
+            //await _itemService.UpdateItem(tran);
             return isDeleted;
         }
     }

@@ -1,0 +1,31 @@
+﻿@page "/ReportView"
+
+@using Inventory.Model
+@using Inventory.Service
+
+@inject ReportService ReportService
+
+<h3>Reports</h3>
+@if (Item == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div style="margin:15px">
+        <LabelValue Label="Total Quantity Purchased" Value=@Item.QtyPurchased />
+        <LabelValue Label="Total quantity sold" Value=@Item.QtySold />
+        <LabelValue Label="Total Cost Price " Value=@Item.CostPrice />
+        <LabelValue Label="Revenue" Value="@Item.Revenue" />
+        <LabelValue Label="Profit" Value="@Item.Profit" />
+    </div>
+}
+
+@code {
+    private Report Item;
+
+    protected async override Task OnInitializedAsync()
+    {
+        Item = await ReportService.GetGenericReport();
+    }
+}

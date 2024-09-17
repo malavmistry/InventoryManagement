@@ -2,7 +2,6 @@
 using Inventory.Properties;
 using Microsoft.Maui.Storage;
 using System;
-using Windows.Storage;
 
 namespace Inventory.Service
 {
@@ -19,8 +18,8 @@ namespace Inventory.Service
             try
             {
                 var dbLocation = _context.GetDbLocation();
-                File.Copy(dbLocation, $"{Resource.DownloadLocation}\\{Resource.DatabaseName}", true);
-                return (true, $"Downloaded to Location: {Resource.DownloadLocation}{Resource.DatabaseName}");
+                File.Copy(dbLocation, $"{Resources.DownloadLocation}\\{Resources.DatabaseName}", true);
+                return (true, $"Downloaded to Location: {Resources.DownloadLocation}{Resources.DatabaseName}");
             }
             catch (Exception e)
             {

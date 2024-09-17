@@ -5,7 +5,10 @@
 @inject TransactionService transactionService
 @inject NavigationManager NavigationManager
 
-<h3>Transactions</h3>
+<div style="height: 2rem">
+    <h3 style="float: left">Transactions</h3>
+    <button class="btn btn-primary" style="float: right !important" @onclick="()=> filterToggle = !filterToggle"> Filter </button>
+</div>
 
 @if (transactions == null)
 {
@@ -13,18 +16,43 @@
 }
 else
 {
+
+    @if (filterToggle)
+    {
+        <div style="margin-top: 2rem">
+            <div>
+                <label>Transaction Type:</label>
+                <select  @onchange='@(async (ChangeEventArgs __e) => await Filter("Trans", __e?.Value?.ToString()))'>
+                    <option value="" selected>All</option>
+                    <option value="purchase">Purchase</option>
+                    <option value="sale">Sale</option>
+                </select>
+            </div>
+            <div>
+                <label>Item:</label>
+                <select @onchange='@(async (ChangeEventArgs __e) => await Filter("Item", __e?.Value?.ToString()))'>
+                    <option value="" selected>All</option>
+                    @foreach (var item in transactionsOg.Select(x=> x.ItemId).Distinct())
+                    {
+                        <option value="@item">@item</option>
+                    }
+                </select>
+            </div>
+        </div>
+    }
+
     <table class="table">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Seller</th>
-                <th>Trans Type</th>
-                <th>Item</th>
-                <th>Price</th>
-                <th>Qty</th>
-                <th>Total Price</th>
-                <th>Remaining Qty</th>
+                <th><a @onclick='async ()=> await Sort("Id")'>ID</a></th>
+                <th><a @onclick='async ()=> await Sort("Date")'>Date</a></th>
+                <th><a @onclick='async ()=> await Sort("Seller")'>Seller</a></th>
+                <th><a @onclick='async ()=> await Sort("Trans")'>Trans Type</a></th>
+                <th><a @onclick='async ()=> await Sort("Item")'>Item</a></th>
+                <th><a @onclick='async ()=> await Sort("Price")'>Price</a></th>
+                <th><a @onclick='async ()=> await Sort("Qty")'>Qty</a></th>
+                <th><a @onclick='async ()=> await Sort("Total")'>Total Price</a></th>
+                <th><a @onclick='async ()=> await Sort("Remaining")'>Remaining Qty</a></th>
                 <th>
                     <a @onclick="NavigateToAddTransaction">
                         <span class="oi oi-plus" aria-hidden="false" />
@@ -46,7 +74,7 @@ else
                     <td>@item.TotalPrice</td>
                     <td>@item.RemainingQty</td>
                     <td>
-                        <a >
+                        <a @onclick="async ()=> await EditTransaction(item)">
                             <span class="oi oi-eye" aria-hidden="false" />
                         </a>
                     </td>
@@ -58,14 +86,87 @@ else
 
 @code {
     private List<Transaction> transactions;
+    private List<Transaction> transactionsOg;
+    private bool filterToggle = false;
+    private string currentSortColumn = "Id";
+    Dictionary<string, Func<Transaction, bool>> conditionLst = new Dictionary<string, Func<Transaction, bool>>() { { "Default", item => true } };
 
     protected override async Task OnInitializedAsync()
     {
-        transactions = await transactionService.GetTransaction();
+        transactionsOg = transactions = await transactionService.GetTransaction();
+    }
+
+    private async Task EditTransaction(Transaction item)
+    {
+        NavigationManager.NavigateTo($"/EditTransactionView/{item.Id}");
+    }
+
+    private async Task Sort(string column)
+    {
+        if (currentSortColumn == column)
+        {
+            transactions = transactionsOg.OrderByDescending(GetSortExpression(column)).ToList();
+        }
+        else
+        {
+            transactions = transactionsOg.OrderBy(GetSortExpression(column)).ToList();
+        }
+        currentSortColumn = column;
+        this.FilterRecords();
+    }
+
+
+    private async Task Filter(string column, string filterValue)
+    {
+        Func<Transaction, bool> condition = null;
+        conditionLst.Remove(column);
+        switch(column)
+        {
+            case "Trans":
+                condition = item => item.Type.ToString().Contains(filterValue ?? item.Type.ToString(), StringComparison.OrdinalIgnoreCase);
+                break;
+            case "Seller":
+                condition = item => item.SellerId.ToString().Contains(filterValue ?? item.SellerId.ToString(), StringComparison.OrdinalIgnoreCase);
+                break;
+            case "Item":
+                condition = item => item.ItemId.ToString().Contains(filterValue ?? item.ItemId.ToString(), StringComparison.OrdinalIgnoreCase);
+                break;
+            default: 
+                break;
+        };
+        conditionLst.Add(column, condition);
+        transactions = transactionsOg;
+        this.FilterRecords();
+    }
+    private void FilterRecords()
+    {
+
+        foreach (var item in conditionLst)
+        {
+            transactions = transactions.Where(item.Value).ToList();
+
+        }
     }
 
     protected async Task NavigateToAddTransaction()
     {
         NavigationManager.NavigateTo("addtransactionview");
+    }
+
+    private Func<Transaction, object> GetSortExpression(string column)
+    {
+        return column switch
+        {
+            "Id" => item => item.Id,
+            "Date" => item => item.Date,
+            "Seller" => item => item.SellerId,
+            "Trans" => item => item.Type,
+            "Item" => item => item.ItemId,
+            "Price" => item => item.Price,
+            "Qty" => item => item.Qty,
+            "Total" => item => item.TotalPrice,
+            "Remaining" => item => item.RemainingQty,
+            _ => item => item.Id
+        };
     }
 }

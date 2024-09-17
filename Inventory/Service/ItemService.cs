@@ -18,12 +18,19 @@ namespace Inventory.Service
         }
         public async Task<bool> AddItems(Items item)
         {
-            var items = await GetAllItems();
-            if (items?.Any(x => x.UPC == item.UPC) ?? false)
-                throw new ApplicationException($"Item with UPC-{item.UPC} already exists.");
-            var result = await _context.AddItemAsync(item);
-            await _context.GetAllAsync<Items>();
-            return result;
+            try
+            {
+                var items = await GetAllItems();
+                if (items?.Any(x => x.UPC == item.UPC) ?? false)
+                    throw new ApplicationException($"Item with UPC-{item.UPC} already exists.");
+                var result = await _context.AddItemAsync(item);
+                await _context.GetAllAsync<Items>();
+                return result;
+            }
+            catch(Exception ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
         }
         public async Task<bool> UpdateItem(Transaction trans)
         {
